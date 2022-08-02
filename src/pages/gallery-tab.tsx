@@ -1,19 +1,15 @@
-import { IonContent, IonFab, IonFabButton, IonIcon, IonPage } from '@ionic/react';
+import { IonButton, IonCol, IonContent, IonGrid, IonIcon, IonItem, IonPage, IonProgressBar, IonRow } from '@ionic/react';
 import { Header } from '../components/header/header';
 import { camera } from 'ionicons/icons';
-import React, { FC, useState } from 'react';
-import { useCamera } from '../hooks/use-camera';
-import { Photo } from '@capacitor/camera';
-import { Image } from '../types/image';
+import { FC } from 'react';
+import { Image as ImageComponent } from '../components/image/image';
+import { usePhotoGallery } from '../hooks/use-photo-gallery';
 
 const GalleryTab: FC = () => {
-  const [photos, setPhotos] = useState<Image[]>([]);
-  const [takePhoto] = useCamera();
-
+  const { capturePhotoAndSave, capturedPhotos, loading } = usePhotoGallery();
   const handleOnCameraClick = async () => {
     try {
-      const photo: Photo = await takePhoto();
-      setPhotos([...photos, { format: photo.format, webPath: photo.webPath as string }]);
+      await capturePhotoAndSave();
     } catch (err) {
       console.log((err as any).message)
     }
@@ -21,18 +17,53 @@ const GalleryTab: FC = () => {
 
   return (
     <IonPage>
-      <Header title='Photo Gallery' />
-      <IonContent fullscreen={false}>
-        <IonFab
-          vertical='bottom'
-          horizontal='center'
+      <Header title='Photo Gallery'
+        endIcon={<div style={{ paddingRight: 13 }}><IonButton
+          onClick={handleOnCameraClick}
+          color={'primary'}
         >
-          <IonFabButton
-            onClick={handleOnCameraClick}
-          >
-            <IonIcon icon={camera} />
-          </IonFabButton>
-        </IonFab>
+          <IonIcon icon={camera} />
+        </IonButton>
+        </div>}
+      />
+      <IonContent fullscreen={false}>
+        {
+          loading && (
+            <IonProgressBar
+              color={'primary'}
+              type='indeterminate' />
+          )
+        }
+
+        {
+          !loading && (
+            <IonGrid>
+              <IonRow>
+                {
+                  capturedPhotos.length === 0 && (
+                    <IonCol>
+                      <IonItem color='primary'>
+                        No photos yet
+                      </IonItem>
+                    </IonCol>
+                  )
+                }
+                {
+                  capturedPhotos.map((photo, photoIdx) => (
+                    <IonCol
+                      size='4'
+                      key={photoIdx}
+                    >
+                      <ImageComponent
+                        src={photo.webPath}
+                      />
+                    </IonCol>
+                  ))
+                }
+              </IonRow>
+            </IonGrid>
+          )
+        }
       </IonContent>
     </IonPage>
   );
