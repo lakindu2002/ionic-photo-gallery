@@ -1,12 +1,22 @@
 import { IonContent, IonFab, IonFabButton, IonIcon, IonPage } from '@ionic/react';
 import { Header } from '../components/header/header';
 import { camera } from 'ionicons/icons';
-import React, { FC } from 'react';
+import React, { FC, useState } from 'react';
+import { useCamera } from '../hooks/use-camera';
+import { Photo } from '@capacitor/camera';
+import { Image } from '../types/image';
 
 const GalleryTab: FC = () => {
+  const [photos, setPhotos] = useState<Image[]>([]);
+  const [takePhoto] = useCamera();
 
-  const handleOnCameraClick = () => {
-    console.log('clicked');
+  const handleOnCameraClick = async () => {
+    try {
+      const photo: Photo = await takePhoto();
+      setPhotos([...photos, { format: photo.format, webPath: photo.webPath as string }]);
+    } catch (err) {
+      console.log((err as any).message)
+    }
   };
 
   return (
