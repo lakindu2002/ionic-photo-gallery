@@ -1,4 +1,4 @@
 export interface Image {
     webPath: string;
-    format: string;
+    filePath: string;
 }
