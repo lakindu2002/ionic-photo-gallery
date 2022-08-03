@@ -15,10 +15,16 @@ export const usePhotoGallery = () => {
     const [loading, setLoading] = useState<boolean>(false);
 
     const loadFromGallery = useCallback(async () => {
-        setLoading(true);
-        const images = await loadImagesFromStorage(PushingDirectory.PHOTOS);
-        setCapturedPhotos(images);
-        setLoading(false);
+        try {
+            setLoading(true);
+            const images = await loadImagesFromStorage(PushingDirectory.PHOTOS);
+            setCapturedPhotos(images);
+        }
+        catch (err) {
+            console.log(err);
+        } finally {
+            setLoading(false);
+        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
