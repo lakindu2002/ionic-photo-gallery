@@ -1,5 +1,6 @@
 import { Directory, Filesystem } from '@capacitor/filesystem';
 import { Storage } from '@capacitor/storage';
+import { isPlatform } from '@ionic/core';
 import { Image } from '../types/image';
 
 export enum PushingDirectory {
@@ -9,11 +10,12 @@ export enum PushingDirectory {
 
 export const useStorage = () => {
     const writeFile = async (fileNameWithFormat: string, base64Data: string) => {
-        await Filesystem.writeFile({
+        const resp = await Filesystem.writeFile({
             data: base64Data,
             path: fileNameWithFormat,
             directory: Directory.Data, // data directory -> Files directory on Android, documents on iOS
         });
+        return resp;
     }
 
     const convertBlobToBase64 = (blob: Blob) => new Promise((resolve, reject) => {
@@ -44,7 +46,11 @@ export const useStorage = () => {
             key: directory
         });
         const parsedImages = JSON.parse(resp.value as string) as Image[];
-        // read each image ref from file system
+        if (isPlatform('hybrid')) {
+            // when in hybrid mode, we can directly view the images in the gallery from filesystem
+            return parsedImages;
+        }
+        // read each image ref from file system and convert it to base 64 if in web
         const readPromises = parsedImages.map(async (image) => {
             const fileInFileSystem = await Filesystem.readFile({
                 path: image.filePath,

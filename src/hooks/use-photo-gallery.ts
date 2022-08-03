@@ -1,3 +1,6 @@
+import { Capacitor } from "@capacitor/core";
+import { Filesystem } from "@capacitor/filesystem";
+import { isPlatform } from "@ionic/core";
 import { useCallback, useEffect, useState } from "react";
 import { Image } from "../types/image";
 import { useCamera } from "./use-camera";
@@ -40,15 +43,24 @@ export const usePhotoGallery = () => {
     }, []);
 
     const capturePhotoAndSave = async () => {
+        const isHybrid = isPlatform("hybrid");
         const photo = await takePhoto();
-        const base64ImageUrn = await convertWebPathToBase64(
-            photo.webPath as string
-        );
+        let base64DataToWrite: string = '';
+        if (isHybrid) {
+            const readFile = await Filesystem.readFile({
+                path: photo.path!,
+            })
+            base64DataToWrite = readFile.data
+        } else {
+            base64DataToWrite = await convertWebPathToBase64(
+                photo.webPath as string
+            ) as string;
+        }
         const fileName = new Date().getTime() + ".jpeg";
-        await writeFile(fileName, base64ImageUrn as string);
+        const writtenResp = await writeFile(fileName, base64DataToWrite as string);
         const capturedPhoto: Image = {
-            filePath: fileName,
-            webPath: photo.webPath as string,
+            filePath: isHybrid ? writtenResp.uri : fileName,
+            webPath: isHybrid ? Capacitor.convertFileSrc(writtenResp.uri) : photo.webPath as string,
         };
         const newlyCapturedPhotos = [capturedPhoto, ...capturedPhotos];
         setCapturedPhotos(newlyCapturedPhotos);
