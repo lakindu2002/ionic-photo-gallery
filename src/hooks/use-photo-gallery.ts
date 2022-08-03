@@ -26,6 +26,13 @@ export const usePhotoGallery = () => {
         loadFromGallery();
     }, [loadFromGallery]);
 
+    useEffect(() => {
+        return () => {
+            // cleanup function when the component is unmounted
+            setCapturedPhotos([]);
+        }
+    }, []);
+
     const capturePhotoAndSave = async () => {
         const photo = await takePhoto();
         const base64ImageUrn = await convertWebPathToBase64(
