@@ -52,26 +52,27 @@ export const useStorage = () => {
         const resp = await Preferences.get({
             key: directory
         });
-        const parsedImages = JSON.parse(resp.value as string) as Image[];
+        if (resp.value === null) {
+            return [];
+        }
+        const parsedImages = JSON.parse(resp.value) as Image[];
         if (isPlatform('hybrid')) {
             // when in hybrid mode, we can directly view the images in the gallery from filesystem
             return parsedImages;
         }
         // read each image ref from file system and convert it to base 64 if in web
-        const readPromises = parsedImages.map(async (image) => {
-            const fileInFileSystem = await Filesystem.readFile({
-                path: image.filePath,
-                directory: Directory.Data,
-            });
-            const newImage: Image = {
-                filePath: image.filePath,
-                // construct base 64
-                webPath: `data:image/jpeg;base64,${fileInFileSystem.data}`,
+        // If running on the web...
+        if (!isPlatform('hybrid')) {
+            for (let photo of parsedImages) {
+                const file = await Filesystem.readFile({
+                    path: photo.filePath,
+                    directory: Directory.Data,
+                });
+                // Web platform only: Load the photo as base64 data
+                photo.webPath = `data:image/jpeg;base64,${file.data}`;
             }
-            return newImage;
-        });
-        const readImages = await Promise.all(readPromises);
-        return readImages;
+        }
+        return parsedImages;
     };
     return { writeFile, convertWebPathToBase64, pushReferencesToStorage, loadImagesFromStorage, deleteFile };
 }

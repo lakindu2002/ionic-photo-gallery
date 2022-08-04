@@ -20,16 +20,10 @@ export const usePhotoGallery = () => {
 
     useEffect(() => {
         const loadFromGallery = async () => {
-            try {
-                setLoading(true);
-                const images = await loadImagesFromStorage(PushingDirectory.PHOTOS);
-                setCapturedPhotos(images);
-            }
-            catch (err) {
-                console.log(err);
-            } finally {
-                setLoading(false);
-            }
+            setLoading(true);
+            const images = await loadImagesFromStorage(PushingDirectory.PHOTOS);
+            setCapturedPhotos(images);
+            setLoading(false);
         }
         loadFromGallery();
     }, [])
