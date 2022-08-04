@@ -35,13 +35,6 @@ export const usePhotoGallery = () => {
         loadFromGallery();
     }, [loadFromGallery]);
 
-    useEffect(() => {
-        return () => {
-            // cleanup function when the component is unmounted
-            setCapturedPhotos([]);
-        }
-    }, []);
-
     const capturePhotoAndSave = async () => {
         const isHybrid = isPlatform("hybrid");
         const photo = await takePhoto();
