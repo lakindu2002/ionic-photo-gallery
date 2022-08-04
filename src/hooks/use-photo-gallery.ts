@@ -18,23 +18,21 @@ export const usePhotoGallery = () => {
     const [capturedPhotos, setCapturedPhotos] = useState<Image[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
 
-    const loadFromGallery = useCallback(async () => {
-        try {
-            setLoading(true);
-            const images = await loadImagesFromStorage(PushingDirectory.PHOTOS);
-            setCapturedPhotos(images);
-        }
-        catch (err) {
-            console.log(err);
-        } finally {
-            setLoading(false);
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-
     useEffect(() => {
+        const loadFromGallery = async () => {
+            try {
+                setLoading(true);
+                const images = await loadImagesFromStorage(PushingDirectory.PHOTOS);
+                setCapturedPhotos(images);
+            }
+            catch (err) {
+                console.log(err);
+            } finally {
+                setLoading(false);
+            }
+        }
         loadFromGallery();
-    }, [loadFromGallery]);
+    }, [])
 
     const capturePhotoAndSave = async () => {
         const isHybrid = isPlatform("hybrid");
