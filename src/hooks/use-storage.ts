@@ -1,5 +1,5 @@
 import { Directory, Filesystem } from '@capacitor/filesystem';
-import { Storage } from '@capacitor/storage';
+import { Preferences } from '@capacitor/preferences';
 import { isPlatform } from '@ionic/core';
 import { Image } from '../types/image';
 
@@ -35,14 +35,14 @@ export const useStorage = () => {
     }
 
     const pushReferencesToStorage = async (references: Image[], directory: PushingDirectory) => {
-        await Storage.set({
+        await Preferences.set({
             key: directory,
             value: JSON.stringify(references),
         })
     }
 
     const loadImagesFromStorage = async (directory: PushingDirectory) => {
-        const resp = await Storage.get({
+        const resp = await Preferences.get({
             key: directory
         });
         const parsedImages = JSON.parse(resp.value as string) as Image[];
