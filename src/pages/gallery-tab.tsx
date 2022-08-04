@@ -1,12 +1,14 @@
-import { IonButton, IonCol, IonContent, IonGrid, IonIcon, IonItem, IonPage, IonProgressBar, IonRow } from '@ionic/react';
+import { IonButton, IonCol, IonContent, IonGrid, IonIcon, IonItem, IonPage, IonProgressBar, IonRow, useIonActionSheet } from '@ionic/react';
 import { Header } from '../components/header/header';
-import { camera } from 'ionicons/icons';
+import { camera, trash } from 'ionicons/icons';
 import { FC } from 'react';
 import { Image as ImageComponent } from '../components/image/image';
 import { usePhotoGallery } from '../hooks/use-photo-gallery';
+import { Image } from '../types/image';
 
 const GalleryTab: FC = () => {
-  const { capturePhotoAndSave, capturedPhotos, loading } = usePhotoGallery();
+  const { capturePhotoAndSave, capturedPhotos, loading, deleteFromGallery } = usePhotoGallery();
+  const [present, dismiss] = useIonActionSheet();
   const handleOnCameraClick = async () => {
     try {
       await capturePhotoAndSave();
@@ -14,6 +16,27 @@ const GalleryTab: FC = () => {
       console.log((err as any).message)
     }
   };
+
+  const handleOnImageClick = (image: Image) => {
+    present({
+      header: 'Manage Image',
+      animated: true,
+      buttons: [
+        {
+          text: 'Delete',
+          icon: trash,
+          role: 'destructive',
+          data: {
+            type: 'delete',
+          },
+          handler: async () => {
+            await deleteFromGallery(image);
+            await dismiss();
+          }
+        }
+      ]
+    });
+  }
 
   return (
     <IonPage>
@@ -56,6 +79,7 @@ const GalleryTab: FC = () => {
                     >
                       <ImageComponent
                         src={photo.webPath}
+                        handleImageClick={() => handleOnImageClick(photo)}
                       />
                     </IonCol>
                   ))

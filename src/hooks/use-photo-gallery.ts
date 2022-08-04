@@ -12,6 +12,7 @@ export const usePhotoGallery = () => {
         convertWebPathToBase64,
         pushReferencesToStorage,
         loadImagesFromStorage,
+        deleteFile
     } = useStorage();
     const [takePhoto] = useCamera();
     const [capturedPhotos, setCapturedPhotos] = useState<Image[]>([]);
@@ -60,5 +61,12 @@ export const usePhotoGallery = () => {
         await pushReferencesToStorage(newlyCapturedPhotos, PushingDirectory.PHOTOS);
     };
 
-    return { capturedPhotos, capturePhotoAndSave, loading };
+    const deleteFromGallery = async (image: Image) => {
+        const newPhotos = capturedPhotos.filter((photo) => photo.filePath !== image.filePath);
+        const filename = image.filePath.substring(image.filePath.lastIndexOf('/') + 1);
+        await Promise.all([deleteFile(filename), pushReferencesToStorage(newPhotos, PushingDirectory.PHOTOS)]);
+        setCapturedPhotos(newPhotos);
+    }
+
+    return { capturedPhotos, capturePhotoAndSave, loading, deleteFromGallery };
 };

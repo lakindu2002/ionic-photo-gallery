@@ -18,6 +18,13 @@ export const useStorage = () => {
         return resp;
     }
 
+    const deleteFile = async (fileNameWithFormat: string) => {
+        await Filesystem.deleteFile({
+            path: fileNameWithFormat,
+            directory: Directory.Data,
+        });
+    }
+
     const convertBlobToBase64 = (blob: Blob) => new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.onerror = reject;
@@ -66,5 +73,5 @@ export const useStorage = () => {
         const readImages = await Promise.all(readPromises);
         return readImages;
     };
-    return { writeFile, convertWebPathToBase64, pushReferencesToStorage, loadImagesFromStorage };
+    return { writeFile, convertWebPathToBase64, pushReferencesToStorage, loadImagesFromStorage, deleteFile };
 }

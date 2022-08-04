@@ -3,12 +3,15 @@ import { FC } from "react";
 
 interface ImageProps {
   src: string;
+  handleImageClick: () => void;
 }
 
-export const Image: FC<ImageProps> = ({ src }) => {
+export const Image: FC<ImageProps> = ({ src, handleImageClick }) => {
   return (
     <>
-      <IonCard>
+      <IonCard
+        onClick={handleImageClick}
+      >
         <img
           src={src}
         />
