@@ -1,7 +1,7 @@
 import { Capacitor } from "@capacitor/core";
 import { Filesystem } from "@capacitor/filesystem";
 import { isPlatform } from "@ionic/core";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Image } from "../types/image";
 import { useCamera } from "./use-camera";
 import { PushingDirectory, useStorage } from "./use-storage";
