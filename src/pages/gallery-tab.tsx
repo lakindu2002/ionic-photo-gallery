@@ -50,27 +50,14 @@ const GalleryTab: FC = () => {
         </div>}
       />
       <IonContent fullscreen={false}>
-        {
-          loading && (
-            <IonProgressBar
-              color={'primary'}
-              type='indeterminate' />
-          )
-        }
+        {loading && (<IonProgressBar color={'primary'} type='indeterminate' />)}
 
         {
           !loading && (
             <IonGrid>
               <IonRow>
                 {
-                  capturedPhotos.length === 0 && (
-                    <IonCol>
-                      <IonItem color='primary'>
-                        No photos yet
-                      </IonItem>
-                    </IonCol>
-                  )
-                }
+                  capturedPhotos.length === 0 && (<IonCol><IonItem color='primary'>No photos yet</IonItem></IonCol>)}
                 {
                   capturedPhotos.map((photo, photoIdx) => (
                     <IonCol
